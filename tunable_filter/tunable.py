@@ -265,6 +265,8 @@ class GaussianBlurFilter(FilterBase):
         width = self.values['kernel_width']
         if width > 0:
             blured = cv2.blur(rgb, (width, width))
+            if rgb.shape[-1] == 1:
+                blured = blured[:, :, np.newaxis]
         else:
             blured = rgb
         return blured
@@ -274,7 +276,7 @@ class CropResizer(ResizerBase):
 
     @classmethod
     def from_image(cls, rgb: np.ndarray):
-        width, height, _ = rgb.shape
+        width, height = rgb.shape[:2]
         configs = []
         configs.append(TrackBarConfig('x_min', 0, width))
         configs.append(TrackBarConfig('x_max', 0, width))
@@ -302,6 +304,8 @@ class ResolutionChangeResizer(ResizerBase):
         resol = max(self.values['resol'], 1)
         interp_method = cv2.INTER_CUBIC
         rgb_resized = cv2.resize(rgb, (resol, resol), interpolation=interp_method)
+        if rgb.shape[-1] == 1:
+            rgb_resized = rgb_resized[:, :, np.newaxis]
         return rgb_resized
 
 
